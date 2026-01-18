@@ -1,60 +1,100 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <title>Coupang Product Lookup</title>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f5f6f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .card {
-      background: white;
-      padding: 24px;
-      border-radius: 12px;
-      width: 360px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 12px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-    }
-    button {
-      width: 100%;
-      margin-top: 16px;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      background: #346aff;
-      color: white;
-      font-size: 15px;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h3>쿠팡 상품 바로가기</h3>
-    <input id="url" placeholder="쿠팡 상품 URL 입력">
-    <button onclick="go()">제품 바로가기</button>
-  </div>
+<meta charset="UTF-8" />
+<title>Coupang Product Search</title>
 
-  <script>
-    async function go() {
-      const url = document.getElementById("url").value;
-      const res = await fetch(
-        `http://127.0.0.1:8000/api/product?coupang_url=${encodeURIComponent(url)}`
-      );
-      const data = await res.json();
-      window.location.href = data.affiliate_url;
-    }
-  </script>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f5f6f7;
+}
+
+.container {
+    max-width: 800px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 12px;
+    font-size: 16px;
+}
+
+.search-box button {
+    padding: 12px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.product {
+    background: #fff;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.product-name {
+    max-width: 70%;
+}
+
+.product-price {
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+    <h1>쿠팡 상품 검색</h1>
+
+    <div class="search-box">
+        <input id="keyword" placeholder="검색어 입력" />
+        <button onclick="search()">검색</button>
+    </div>
+
+    <div id="results"></div>
+</div>
+
+<script>
+async function search() {
+    const keyword = document.getElementById("keyword").value.trim();
+    if (!keyword) return;
+
+    const res = await fetch(
+        `http://localhost:5000/search?keyword=${encodeURIComponent(keyword)}`
+    );
+    const data = await res.json();
+
+    const results = document.getElementById("results");
+    results.innerHTML = "";
+
+    data.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+            <div class="product-name">${p.name}</div>
+            <div class="product-price">${p.price.toLocaleString()}원</div>
+        `;
+        results.appendChild(div);
+    });
+}
+</script>
 </body>
 </html>
